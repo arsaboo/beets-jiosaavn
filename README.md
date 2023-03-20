@@ -14,7 +14,7 @@ Then, [configure](#configuration) the plugin in your
 
 ## Configuration
 
-Add `plexsync` to your list of enabled plugins.
+Add `JioSaavn` to your list of enabled plugins.
 
 ```yaml
 plugins: jiosaavn
