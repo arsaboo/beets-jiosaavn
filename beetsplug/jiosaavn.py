@@ -4,7 +4,6 @@ Adds JioSaavn support to the autotagger.
 
 import collections
 import re
-import sys
 
 from beets.autotag.hooks import AlbumInfo, Distance, TrackInfo
 from beets.plugins import BeetsPlugin
@@ -60,14 +59,13 @@ class JioSaavnPlugin(BeetsPlugin):
             query = f'{release} {artist}'
         try:
             return self.get_albums(query)
-        except:
-            e = sys.exc_info()[0]
-            self._log.debug('JioSaavn Search Error: %s (query: %s' % (e, query))
+        except Exception as e:
+            self._log.debug('JioSaavn Search Error: {}'.format(e))
             return []
 
-
     def get_album_info(self, item, type):
-
+        """Returns an AlbumInfo object for a JioSaavn album.
+        """
         album = item["title"]
         jiosaavn_album_id = item["albumid"]
         perma_url = item["perma_url"]
@@ -90,25 +88,25 @@ class JioSaavnPlugin(BeetsPlugin):
         for track in tracks:
             track.medium_total = medium_totals[track.medium]
         return AlbumInfo(album=album,
-                        album_id=jiosaavn_album_id,
-                        jiosaavn_album_id=jiosaavn_album_id,
-                        artist=artists,
-                        artist_id=artist_id,
-                        jiosaavn_artist_id=artist_id,
-                        tracks=tracks,
-                        albumtype=type,
-                        year=year,
-                        month=month,
-                        day=day,
-                        mediums=max(medium_totals.keys()),
-                        data_source=self.data_source,
-                        jiosaavn_perma_url=perma_url,
+                         album_id=jiosaavn_album_id,
+                         jiosaavn_album_id=jiosaavn_album_id,
+                         artist=artists,
+                         artist_id=artist_id,
+                         jiosaavn_artist_id=artist_id,
+                         tracks=tracks,
+                         albumtype=type,
+                         year=year,
+                         month=month,
+                         day=day,
+                         mediums=max(medium_totals.keys()),
+                         data_source=self.data_source,
+                         jiosaavn_perma_url=perma_url,
                         )
 
     def _get_track(self, track_data):
-        """Convert a JioSaavn track object dict to a TrackInfo object.
+        """Convert a JioSaavn song object to a TrackInfo object.
         """
-        # Get album information for spotify tracks
+        # Get album information for JioSaavn tracks
         return TrackInfo(
             title=track_data['song'],
             track_id=track_data['id'],
