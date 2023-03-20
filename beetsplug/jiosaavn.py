@@ -15,7 +15,9 @@ class JioSaavnPlugin(BeetsPlugin):
 
     def __init__(self):
         super().__init__()
-
+        self.config.add({
+            'source_weight': 0.5,
+        })
     def album_distance(self, items, album_info, mapping):
         """Returns the album distance.
         """
