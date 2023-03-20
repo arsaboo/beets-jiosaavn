@@ -42,8 +42,8 @@ class JioSaavnPlugin(BeetsPlugin):
         self._log.debug('Searching JioSaavn for: {}', query)
         try:
             data = self.jiosaavn.search_album(query)
-        except:
-            self._log.debug('Invalid search query: {}', query)
+        except Exception as e:
+            self._log.debug('Invalid Search Error: {}'.format(e))
         for album in data["results"]:
             id = self.jiosaavn.create_identifier(album["perma_url"], 'album')
             album_details = self.jiosaavn.get_album_details(id)
@@ -103,7 +103,7 @@ class JioSaavnPlugin(BeetsPlugin):
                          mediums=max(medium_totals.keys()),
                          data_source=self.data_source,
                          jiosaavn_perma_url=perma_url,
-                        )
+                         )
 
     def _get_track(self, track_data):
         """Convert a JioSaavn song object to a TrackInfo object.
