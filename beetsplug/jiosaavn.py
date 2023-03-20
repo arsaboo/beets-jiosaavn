@@ -47,7 +47,7 @@ class JioSaavnPlugin(BeetsPlugin):
         for album in data["results"]:
             id = self.jiosaavn.create_identifier(album["perma_url"], 'album')
             album_details = self.jiosaavn.get_album_details(id)
-            album_info = self.get_album_info(album_details, type)
+            album_info = self.get_album_info(album_details, album["type"])
             albums.append(album_info)
         return albums
 
