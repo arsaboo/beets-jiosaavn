@@ -1,4 +1,4 @@
-# beets-jiosaavn - NOT READY (WIP)
+# beets-jiosaavn
 A plugin for [beets](https://github.com/beetbox/beets) to use JioSaavn as a metadata source.
 
 ## Installation

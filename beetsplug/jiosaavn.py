@@ -13,26 +13,21 @@ from musicapy.saavn_api.api import SaavnAPI
 
 class JioSaavnPlugin(BeetsPlugin):
     data_source = 'JioSaavn'
-    # Base URLs for the JioSaavn API
-    # Documentation: https://developers.deezer.com/api/
-    search_url = "https://www.jiosaavn.com/api.php?__call=autocomplete.get&_format=json&_marker=0&cc=in&includeMetaTags=1&query="
-    album_url = "https://www.jiosaavn.com/api.php?__call=content.getAlbumDetails&_format=json&cc=in&_marker=0%3F_marker%3D0&albumid="
-    track_url = "https://www.jiosaavn.com/api.php?__call=song.getDetails&cc=in&_marker=0%3F_marker%3D0&_format=json&pids="
 
     def __init__(self):
         super().__init__()
 
-    # def album_distance(self, items, album_info, mapping):
-    #     """Returns the album distance.
-    #     """
-    #     dist = Distance()
-    #     if album_info.data_source == 'JioSaavn':
-    #         dist.add('source', self.config['source_weight'].as_number())
-    #     return dist
+    def album_distance(self, items, album_info, mapping):
+        """Returns the album distance.
+        """
+        dist = Distance()
+        if album_info.data_source == 'JioSaavn':
+            dist.add('source', self.config['source_weight'].as_number())
+        return dist
 
     jiosaavn = SaavnAPI()
     def get_albums(self, query):
-        """Returns a list of AlbumInfo objects for a Amazon search query.
+        """Returns a list of AlbumInfo objects for a JioSaavn search query.
         """
         # Strip non-word characters from query. Things like "!" and "-" can
         # cause a query to return no results, even if they match the artist or
@@ -70,12 +65,6 @@ class JioSaavnPlugin(BeetsPlugin):
             self._log.debug('JioSaavn Search Error: %s (query: %s' % (e, query))
             return []
 
-
-    def decod(self, val, codec='utf8'):
-        """Ensure that all string are coded to Unicode.
-        """
-        if isinstance(val, str):
-            return val.decode(codec, 'ignore')
 
     def get_album_info(self, item, type):
 
