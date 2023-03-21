@@ -81,6 +81,7 @@ class JioSaavnPlugin(BeetsPlugin):
             data = self.jiosaavn.search_song(query)
         except Exception as e:
             self._log.debug('Invalid Search Error: {}'.format(e))
+        self._log.debug('JioSaavn Search Results: {}', data)
         for track in data["results"]:
             id = self.jiosaavn.create_identifier(track["perma_url"], 'song')
             song_details = self.jiosaavn.get_song_details(id)
