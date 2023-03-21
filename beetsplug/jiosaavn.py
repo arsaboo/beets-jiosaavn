@@ -85,7 +85,9 @@ class JioSaavnPlugin(BeetsPlugin):
         for track in data["results"]:
             self._log.debug('JioSaavn Track: {}', track)
             id = self.jiosaavn.create_identifier(track["perma_url"], 'song')
+            self._log.debug('JioSaavn Track ID: {}', id)
             song_details = self.jiosaavn.get_song_details(id)
+            self._log.debug('JioSaavn Song Details: {}', song_details)
             song_info = self._get_track(song_details["songs"])
             tracks.append(song_info)
         return tracks
