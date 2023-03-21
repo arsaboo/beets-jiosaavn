@@ -40,6 +40,7 @@ class JioSaavnPlugin(BeetsPlugin):
         )
 
     jiosaavn = SaavnAPI()
+
     def get_albums(self, query):
         """Returns a list of AlbumInfo objects for a JioSaavn search query.
         """
@@ -180,21 +181,19 @@ class JioSaavnPlugin(BeetsPlugin):
         )
 
     def album_for_id(self, release_id):
-        """Fetches a release by its JioSaavn ID and returns an AlbumInfo object
-        or None if the query is not a valid ID or album is not found.
+        """Fetches an album by its JioSaavn ID and returns an AlbumInfo object
         """
+        if not "jiosaavn.com/album/" in release_id:
+            return None
         self._log.debug('Searching for album {0}', release_id)
-
         id = self.jiosaavn.create_identifier(release_id, 'album')
-
         album_details = self.jiosaavn.get_album_details(id)
         return self.get_album_info(album_details, 'album')
 
     def track_for_id(self, track_id=None):
         """Fetches a track by its JioSaavn ID and returns a TrackInfo object
-        or None if the track is not a valid Beatport ID or track is not found.
         """
-        if not "/song/" in track_id:
+        if not "jiosaavn.com/song/" in track_id:
             return None
         self._log.debug('Searching for track {0}', track_id)
         id = self.jiosaavn.create_identifier(track_id, 'song')
