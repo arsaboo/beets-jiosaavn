@@ -85,9 +85,9 @@ class JioSaavnPlugin(BeetsPlugin):
         for track in data["results"]:
             id = self.jiosaavn.create_identifier(track["perma_url"], 'song')
             song_details = self.jiosaavn.get_song_details(id)
-            self._log.debug('JioSaavn Song Details: {}', song_details)
             song_info = self._get_track(song_details["songs"])
             tracks.append(song_info)
+            self._log.debug('JioSaavn Track Info: {}', song_info)
         return tracks
 
     def candidates(self, items, artist, release, va_likely, extra_tags=None):
@@ -158,7 +158,6 @@ class JioSaavnPlugin(BeetsPlugin):
     def _get_track(self, track_data):
         """Convert a JioSaavn song object to a TrackInfo object.
         """
-        print("Track Data: ", track_data)
         if track_data['duration']:
             length = int(track_data['duration'])
         elif track_data['more_info']['duration']:
