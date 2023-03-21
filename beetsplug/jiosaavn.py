@@ -87,7 +87,6 @@ class JioSaavnPlugin(BeetsPlugin):
             print('song_details: ', song_details["songs"][0])
             song_info = self._get_track(song_details["songs"][0])
             tracks.append(song_info)
-            self._log.debug('JioSaavn Track Info: {}', song_info)
         return tracks
 
     def candidates(self, items, artist, release, va_likely, extra_tags=None):
@@ -162,13 +161,16 @@ class JioSaavnPlugin(BeetsPlugin):
             length = int(track_data['duration'].strip())
         elif track_data['more_info']['duration']:
             length = int(track_data['more_info']['duration'].strip())
-        print('length', length)
+        if track_data['singers'] == "":
+            artist = track_data['music']
+        else:
+            artist = track_data['singers']
         # Get album information for JioSaavn tracks
         return TrackInfo(
             title=track_data['song'],
             track_id=track_data['id'],
             jiosaavn_track_id=track_data['id'],
-            artist=track_data['singers'],
+            artist=artist,
             album=track_data['album'],
             jiosaavn_artist_id=track_data["music_id"],
             length=length,
