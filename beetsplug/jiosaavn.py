@@ -171,7 +171,7 @@ class JioSaavnPlugin(BeetsPlugin):
             track_id=track_data['id'],
             jiosaavn_track_id=track_data['id'],
             artist=artist,
-            album=track_data['album'],
+            album=track_data['album'].replace("&quot;", "\""),
             jiosaavn_artist_id=track_data["music_id"],
             length=length,
             data_source=self.data_source,
