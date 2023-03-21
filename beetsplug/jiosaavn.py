@@ -190,10 +190,12 @@ class JioSaavnPlugin(BeetsPlugin):
         album_details = self.jiosaavn.get_album_details(id)
         return self.get_album_info(album_details, 'album')
 
-    def track_for_id(self, track_id):
+    def track_for_id(self, track_id=None):
         """Fetches a track by its JioSaavn ID and returns a TrackInfo object
         or None if the track is not a valid Beatport ID or track is not found.
         """
+        if not "/song/" in track_id:
+            return None
         self._log.debug('Searching for track {0}', track_id)
         id = self.jiosaavn.create_identifier(track_id, 'song')
         song_details = self.jiosaavn.get_song_details(id)
