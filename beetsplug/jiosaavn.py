@@ -83,6 +83,7 @@ class JioSaavnPlugin(BeetsPlugin):
             self._log.debug('Invalid Search Error: {}'.format(e))
         self._log.debug('JioSaavn Search Results: {}', data)
         for track in data["results"]:
+            self._log.debug('JioSaavn Track: {}', track)
             id = self.jiosaavn.create_identifier(track["perma_url"], 'song')
             song_details = self.jiosaavn.get_song_details(id)
             song_info = self._get_track(song_details["songs"])
