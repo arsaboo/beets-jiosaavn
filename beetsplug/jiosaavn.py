@@ -116,7 +116,7 @@ class JioSaavnPlugin(BeetsPlugin):
     def get_album_info(self, item, type):
         """Returns an AlbumInfo object for a JioSaavn album.
         """
-        album = item["title"]
+        album = item["title"].replace("&quot;", "\"")
         jiosaavn_album_id = item["albumid"]
         perma_url = item["perma_url"]
         artist_id = item["primary_artists_id"]
@@ -166,7 +166,7 @@ class JioSaavnPlugin(BeetsPlugin):
             artist = track_data['singers']
         # Get album information for JioSaavn tracks
         return TrackInfo(
-            title=track_data['song'],
+            title=track_data['song'].replace("&quot;", "\""),
             track_id=track_data['id'],
             jiosaavn_track_id=track_data['id'],
             artist=artist,
