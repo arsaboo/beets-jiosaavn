@@ -178,3 +178,23 @@ class JioSaavnPlugin(BeetsPlugin):
             jiosaavn_perma_url=track_data['perma_url'],
             data_url=track_data['perma_url'],
         )
+
+    def album_for_id(self, release_id):
+        """Fetches a release by its JioSaavn ID and returns an AlbumInfo object
+        or None if the query is not a valid ID or album is not found.
+        """
+        self._log.debug('Searching for album {0}', release_id)
+
+        id = self.jiosaavn.create_identifier(release_id, 'album')
+
+        album_details = self.jiosaavn.get_album_details(id)
+        return self.get_album_info(album_details, 'album')
+
+    def track_for_id(self, track_id):
+        """Fetches a track by its JioSaavn ID and returns a TrackInfo object
+        or None if the track is not a valid Beatport ID or track is not found.
+        """
+        self._log.debug('Searching for track {0}', track_id)
+        id = self.jiosaavn.create_identifier(track_id, 'song')
+        song_details = self.jiosaavn.get_song_details(id)
+        return self._get_track(song_details["songs"][0])
