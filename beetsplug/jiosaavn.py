@@ -157,7 +157,7 @@ class JioSaavnPlugin(BeetsPlugin):
     def _get_track(self, track_data):
         """Convert a JioSaavn song object to a TrackInfo object.
         """
-        try:
+        if track_data['duration']:
             length = int(track_data['duration'].strip())
         elif track_data['more_info']['duration']:
             length = int(track_data['more_info']['duration'].strip())
