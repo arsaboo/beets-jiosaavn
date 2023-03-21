@@ -151,6 +151,7 @@ class JioSaavnPlugin(BeetsPlugin):
                          mediums=max(medium_totals.keys()),
                          data_source=self.data_source,
                          jiosaavn_perma_url=perma_url,
+                         data_url=perma_url,
                          )
 
     def _get_track(self, track_data):
@@ -175,4 +176,5 @@ class JioSaavnPlugin(BeetsPlugin):
             length=length,
             data_source=self.data_source,
             jiosaavn_perma_url=track_data['perma_url'],
+            data_url=track_data['perma_url'],
         )
