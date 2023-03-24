@@ -166,6 +166,10 @@ class JioSaavnPlugin(BeetsPlugin):
             artist = track_data['music']
         else:
             artist = track_data['singers']
+        if not track_data['starring'] == "":
+            starring = track_data['starring']
+        else:
+            starring = None
         # Get album information for JioSaavn tracks
         return TrackInfo(
             title=track_data['song'].replace("&quot;", "\""),
@@ -177,6 +181,7 @@ class JioSaavnPlugin(BeetsPlugin):
             length=length,
             data_source=self.data_source,
             jiosaavn_perma_url=track_data['perma_url'],
+            jiosaavn_starring=starring,
             data_url=track_data['perma_url'],
         )
 
