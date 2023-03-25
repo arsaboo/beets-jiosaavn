@@ -4,6 +4,7 @@ Adds JioSaavn support to the autotagger.
 
 import collections
 import re
+import time
 
 from beets.autotag.hooks import AlbumInfo, Distance, TrackInfo
 from beets.plugins import BeetsPlugin, get_distance
@@ -12,6 +13,15 @@ from musicapy.saavn_api.api import SaavnAPI
 
 class JioSaavnPlugin(BeetsPlugin):
     data_source = 'JioSaavn'
+
+    item_types = {
+        'jiosaavn_album_id': types.INTEGER,
+        'jiosaavn_artist_id': types.INTEGER,
+        'jiosaavn_track_id': types.STRING,
+        'jiosaavn_starring': types.STRING,
+        'jiosaavn_perma_url': types.STRING,
+        'jiosaavn_updated': DateType(),
+    }
 
     def __init__(self):
         super().__init__()
@@ -183,6 +193,7 @@ class JioSaavnPlugin(BeetsPlugin):
             jiosaavn_perma_url=track_data['perma_url'],
             jiosaavn_starring=starring,
             data_url=track_data['perma_url'],
+            jiosaavn_updated=time.time(),
         )
 
     def album_for_id(self, release_id):
