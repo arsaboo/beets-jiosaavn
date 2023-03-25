@@ -7,6 +7,7 @@ import re
 import time
 
 from beets.autotag.hooks import AlbumInfo, Distance, TrackInfo
+from beets.dbcore import types
 from beets.plugins import BeetsPlugin, get_distance
 from musicapy.saavn_api.api import SaavnAPI
 
