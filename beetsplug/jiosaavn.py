@@ -5,12 +5,15 @@ Adds JioSaavn support to the autotagger.
 import collections
 import re
 import time
+from io import BytesIO
 
+import requests
 from beets.autotag.hooks import AlbumInfo, Distance, TrackInfo
 from beets.dbcore import types
 from beets.library import DateType
 from beets.plugins import BeetsPlugin, get_distance
 from musicapy.saavn_api.api import SaavnAPI
+from PIL import Image
 
 
 class JioSaavnPlugin(BeetsPlugin):
@@ -135,7 +138,12 @@ class JioSaavnPlugin(BeetsPlugin):
         perma_url = item["perma_url"]
         artist_id = item["primary_artists_id"]
         year = item["year"]
-        cover_art_url = item["image"]
+        if self.is_valid_image_url(item["image"].replace("150x150",
+                                                         "500x500")):
+            cover_art_url = item["image"].replace("150x150", "500x500")
+        print(cover_art_url)
+        if item["songs"][0]["label"] is not None:
+            label = item["songs"][0]["label"]
         if item["release_date"] is not None:
             releasedate = item["release_date"].split("-")
             year = int(releasedate[0])
@@ -167,7 +175,8 @@ class JioSaavnPlugin(BeetsPlugin):
                          data_source=self.data_source,
                          jiosaavn_perma_url=perma_url,
                          data_url=perma_url,
-                         cover_art_url=cover_art_url
+                         cover_art_url=cover_art_url,
+                         label=label,
                          )
 
     def _get_track(self, track_data):
@@ -220,3 +229,11 @@ class JioSaavnPlugin(BeetsPlugin):
         id = self.jiosaavn.create_identifier(track_id, 'song')
         song_details = self.jiosaavn.get_song_details(id)
         return self._get_track(song_details["songs"][0])
+
+    def is_valid_image_url(sef, url):
+        try:
+            response = requests.get(url)
+            img = Image.open(BytesIO(response.content))
+            return True
+        except:
+            return False
