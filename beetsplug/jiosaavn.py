@@ -136,6 +136,8 @@ class JioSaavnPlugin(BeetsPlugin):
         artist_id = item["primary_artists_id"]
         year = item["year"]
         cover_art_url = item["image"]
+        if item["songs"][0]["label"] is not None:
+            label = item["songs"][0]["label"]
         if item["release_date"] is not None:
             releasedate = item["release_date"].split("-")
             year = int(releasedate[0])
@@ -167,7 +169,8 @@ class JioSaavnPlugin(BeetsPlugin):
                          data_source=self.data_source,
                          jiosaavn_perma_url=perma_url,
                          data_url=perma_url,
-                         cover_art_url=cover_art_url
+                         cover_art_url=cover_art_url,
+                         label=label,
                          )
 
     def _get_track(self, track_data):
