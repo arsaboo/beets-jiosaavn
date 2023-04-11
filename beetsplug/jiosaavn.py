@@ -138,6 +138,7 @@ class JioSaavnPlugin(BeetsPlugin):
         cover_art_url = item["image"]
         if item["songs"][0]["label"] is not None:
             label = item["songs"][0]["label"]
+            print(label)
         if item["release_date"] is not None:
             releasedate = item["release_date"].split("-")
             year = int(releasedate[0])
