@@ -138,10 +138,10 @@ class JioSaavnPlugin(BeetsPlugin):
         perma_url = item["perma_url"]
         artist_id = item["primary_artists_id"]
         year = item["year"]
-        if self.is_valid_image_url(item["image"].
-                                   replace("150x150", "500x500")):
+        if self.is_valid_image_url(item["image"].replace("150x150",
+                                                         "500x500")):
             cover_art_url = item["image"].replace("150x150", "500x500")
-            print(cover_art_url)
+        print(cover_art_url)
         if item["songs"][0]["label"] is not None:
             label = item["songs"][0]["label"]
         if item["release_date"] is not None:
