@@ -13,6 +13,8 @@ setup(
     packages=['beetsplug'],
     install_requires=[
         'beets>=1.6.0',
-        'MusicAPy @ git+https://github.com/dmdhrumilmistry/MusicAPy'
+        'MusicAPy @ git+https://github.com/dmdhrumilmistry/MusicAPy',
+        'requests',
+        'pillow',
     ],
 )
