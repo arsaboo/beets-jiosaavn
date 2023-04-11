@@ -138,10 +138,9 @@ class JioSaavnPlugin(BeetsPlugin):
         perma_url = item["perma_url"]
         artist_id = item["primary_artists_id"]
         year = item["year"]
-        if self.is_valid_image_url(item["image"].replace("150x150",
-                                                         "500x500")):
-            cover_art_url = item["image"].replace("150x150", "500x500")
-        print(cover_art_url)
+        url = item["image"].replace("150x150", "500x500")
+        if self.is_valid_image_url(url):
+            cover_art_url = url
         if item["songs"][0]["label"] is not None:
             label = item["songs"][0]["label"]
         if item["release_date"] is not None:
@@ -213,7 +212,7 @@ class JioSaavnPlugin(BeetsPlugin):
     def album_for_id(self, release_id):
         """Fetches an album by its JioSaavn ID and returns an AlbumInfo object
         """
-        if not "jiosaavn.com/album/" in release_id:
+        if 'jiosaavn.com/album/' not in release_id:
             return None
         self._log.debug('Searching for album {0}', release_id)
         id = self.jiosaavn.create_identifier(release_id, 'album')
@@ -223,7 +222,7 @@ class JioSaavnPlugin(BeetsPlugin):
     def track_for_id(self, track_id=None):
         """Fetches a track by its JioSaavn ID and returns a TrackInfo object
         """
-        if not "jiosaavn.com/song/" in track_id:
+        if 'jiosaavn.com/song/' not in track_id:
             return None
         self._log.debug('Searching for track {0}', track_id)
         id = self.jiosaavn.create_identifier(track_id, 'song')
@@ -233,7 +232,7 @@ class JioSaavnPlugin(BeetsPlugin):
     def is_valid_image_url(sef, url):
         try:
             response = requests.get(url)
-            img = Image.open(BytesIO(response.content))
+            Image.open(BytesIO(response.content))
             return True
         except:
             return False
