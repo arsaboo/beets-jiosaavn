@@ -229,7 +229,7 @@ class JioSaavnPlugin(BeetsPlugin):
         song_details = self.jiosaavn.get_song_details(id)
         return self._get_track(song_details["songs"][0])
 
-    def is_valid_image_url(url):
+    def is_valid_image_url(sef, url):
         try:
             response = requests.get(url)
             img = Image.open(BytesIO(response.content))
