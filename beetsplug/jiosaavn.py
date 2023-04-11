@@ -136,6 +136,7 @@ class JioSaavnPlugin(BeetsPlugin):
         artist_id = item["primary_artists_id"]
         year = item["year"]
         cover_art_url = item["image"]
+        print(item["songs"][0])
         if item["songs"][0]["label"] is not None:
             label = item["songs"][0]["label"]
             print(label)
