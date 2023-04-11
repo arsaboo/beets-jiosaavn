@@ -23,6 +23,7 @@ class JioSaavnPlugin(BeetsPlugin):
         'jiosaavn_starring': types.STRING,
         'jiosaavn_perma_url': types.STRING,
         'jiosaavn_updated': DateType(),
+        'cover_art_url': types.STRING,
     }
 
     def __init__(self):
@@ -134,6 +135,7 @@ class JioSaavnPlugin(BeetsPlugin):
         perma_url = item["perma_url"]
         artist_id = item["primary_artists_id"]
         year = item["year"]
+        cover_art_url = item["image"]
         if item["release_date"] is not None:
             releasedate = item["release_date"].split("-")
             year = int(releasedate[0])
@@ -165,6 +167,7 @@ class JioSaavnPlugin(BeetsPlugin):
                          data_source=self.data_source,
                          jiosaavn_perma_url=perma_url,
                          data_url=perma_url,
+                         cover_art_url=cover_art_url
                          )
 
     def _get_track(self, track_data):
