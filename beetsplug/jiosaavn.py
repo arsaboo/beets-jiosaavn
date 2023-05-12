@@ -34,6 +34,7 @@ class JioSaavnPlugin(BeetsPlugin):
         self.config.add({
             'source_weight': 0.5,
         })
+        self.jiosaavn = SaavnAPI()
 
     def album_distance(self, items, album_info, mapping):
 
@@ -55,7 +56,7 @@ class JioSaavnPlugin(BeetsPlugin):
             config=self.config
         )
 
-    jiosaavn = SaavnAPI()
+    # jiosaavn = SaavnAPI()
 
     def get_albums(self, query):
         """Returns a list of AlbumInfo objects for a JioSaavn search query.
