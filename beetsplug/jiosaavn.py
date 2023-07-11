@@ -186,6 +186,8 @@ class JioSaavnPlugin(BeetsPlugin):
             length = int(track_data['duration'].strip())
         elif track_data['more_info']['duration']:
             length = int(track_data['more_info']['duration'].strip())
+        else:
+            length = None
         if track_data['singers'] == "":
             artist = track_data['music']
         else:
