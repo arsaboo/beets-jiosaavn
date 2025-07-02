@@ -8,7 +8,8 @@ import time
 from io import BytesIO
 
 import requests
-from beets.autotag.hooks import AlbumInfo, Distance, TrackInfo
+from beets.autotag.hooks import AlbumInfo, TrackInfo
+from beets.autotag.distance import Distance
 from beets.dbcore import types
 from beets.library import DateType
 from beets.plugins import BeetsPlugin, get_distance
