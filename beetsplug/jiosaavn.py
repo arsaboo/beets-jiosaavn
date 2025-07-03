@@ -9,7 +9,10 @@ from io import BytesIO
 
 import requests
 from beets.autotag.hooks import AlbumInfo, TrackInfo
-from beets.autotag.distance import Distance
+try:
+    from beets.autotag.distance import Distance
+except ImportError:
+    from beets.autotag.hooks import Distance
 from beets.dbcore import types
 from beets.library import DateType
 from beets.plugins import BeetsPlugin, get_distance
