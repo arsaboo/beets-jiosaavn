@@ -8,10 +8,11 @@ import time
 from io import BytesIO
 
 import requests
-from beets.autotag.hooks import AlbumInfo, Distance, TrackInfo
+from beets.autotag.distance import Distance
+from beets.autotag.hooks import AlbumInfo, TrackInfo
 from beets.dbcore import types
 from beets.library import DateType
-from beets.plugins import BeetsPlugin, get_distance
+from beets.plugins import BeetsPlugin
 from musicapy.saavn_api.api import SaavnAPI
 from PIL import Image
 
@@ -50,11 +51,10 @@ class JioSaavnPlugin(BeetsPlugin):
         """Returns the JioSaavn source weight and the maximum source weight
         for individual tracks.
         """
-        return get_distance(
-            data_source=self.data_source,
-            info=track_info,
-            config=self.config
-        )
+        dist = Distance()
+        if track_info.data_source == 'JioSaavn':
+            dist.add('source', self.config['source_weight'].as_number())
+        return dist
 
     # jiosaavn = SaavnAPI()
 
