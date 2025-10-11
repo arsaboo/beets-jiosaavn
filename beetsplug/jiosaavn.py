@@ -9,13 +9,9 @@ from io import BytesIO
 
 import requests
 from beets.autotag.hooks import AlbumInfo, TrackInfo
-try:
-    from beets.autotag.distance import Distance
-except ImportError:
-    from beets.autotag.hooks import Distance
 from beets.dbcore import types
 from beets.library import DateType
-from beets.plugins import BeetsPlugin, get_distance
+from beets.plugins import BeetsPlugin
 from musicapy.saavn_api.api import SaavnAPI
 from PIL import Image
 
@@ -36,31 +32,13 @@ class JioSaavnPlugin(BeetsPlugin):
     def __init__(self):
         super().__init__()
         self.config.add({
-            'source_weight': 0.5,
+            'data_source_mismatch_penalty': 0.5,
         })
-        self.jiosaavn = SaavnAPI()
-
-    def album_distance(self, items, album_info, mapping):
-
-        """Returns the album distance.
-        """
-        dist = Distance()
-        if album_info.data_source == 'JioSaavn':
-            dist.add('source', self.config['source_weight'].as_number())
-        return dist
-
-    def track_distance(self, item, track_info):
-
-        """Returns the JioSaavn source weight and the maximum source weight
-        for individual tracks.
-        """
-        return get_distance(
-            data_source=self.data_source,
-            info=track_info,
-            config=self.config
+        # Expose the attribute expected by beets' metadata_plugins.get_penalty(...)
+        self.data_source_mismatch_penalty = (
+            self.config['data_source_mismatch_penalty'].as_number()
         )
-
-    # jiosaavn = SaavnAPI()
+        self.jiosaavn = SaavnAPI()
 
     def get_albums(self, query):
         """Returns a list of AlbumInfo objects for a JioSaavn search query.
