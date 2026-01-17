@@ -14,8 +14,15 @@ Then, [configure](#configuration) the plugin in your
 
 ## Configuration
 
-Add `JioSaavn` to your list of enabled plugins.
+Add `jiosaavn` to your list of enabled plugins.
 
 ```yaml
 plugins: jiosaavn
+
+jiosaavn:
+  data_source_mismatch_penalty: 0.5
 ```
+
+### Configuration Options
+
+- **data_source_mismatch_penalty** (default: 0.5): Penalty applied when the metadata source doesn't match JioSaavn during autotagging. Lower values increase JioSaavn's priority.

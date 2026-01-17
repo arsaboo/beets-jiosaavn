@@ -8,16 +8,30 @@ import time
 from io import BytesIO
 
 import requests
-from beets.autotag.distance import Distance
 from beets.autotag.hooks import AlbumInfo, TrackInfo
 from beets.dbcore import types
 from beets.library import DateType
-from beets.plugins import BeetsPlugin
+from beets.metadata_plugins import MetadataSourcePlugin
 from musicapy.saavn_api.api import SaavnAPI
 from PIL import Image
 
+try:
+    from beets.importer.tasks import REIMPORT_FRESH_FIELDS_ITEM
+except ImportError:
+    REIMPORT_FRESH_FIELDS_ITEM = None
 
-class JioSaavnPlugin(BeetsPlugin):
+
+def extend_reimport_fresh_fields_item():
+    """Extend the REIMPORT_FRESH_FIELDS_ITEM list so that these fields
+    are updated during reimport."""
+
+    if REIMPORT_FRESH_FIELDS_ITEM is not None:
+        REIMPORT_FRESH_FIELDS_ITEM.extend([
+            'jiosaavn_album_id', 'jiosaavn_track_id', 'jiosaavn_artist_id',
+            'jiosaavn_starring', 'jiosaavn_perma_url', 'jiosaavn_updated'])
+
+
+class JioSaavnPlugin(MetadataSourcePlugin):
     data_source = 'JioSaavn'
 
     item_types = {
@@ -33,30 +47,10 @@ class JioSaavnPlugin(BeetsPlugin):
     def __init__(self):
         super().__init__()
         self.config.add({
-            'source_weight': 0.5,
+            'data_source_mismatch_penalty': 0.5,
         })
+        extend_reimport_fresh_fields_item()
         self.jiosaavn = SaavnAPI()
-
-    def album_distance(self, items, album_info, mapping):
-
-        """Returns the album distance.
-        """
-        dist = Distance()
-        if album_info.data_source == 'JioSaavn':
-            dist.add('source', self.config['source_weight'].as_number())
-        return dist
-
-    def track_distance(self, item, track_info):
-
-        """Returns the JioSaavn source weight and the maximum source weight
-        for individual tracks.
-        """
-        dist = Distance()
-        if track_info.data_source == 'JioSaavn':
-            dist.add('source', self.config['source_weight'].as_number())
-        return dist
-
-    # jiosaavn = SaavnAPI()
 
     def get_albums(self, query):
         """Returns a list of AlbumInfo objects for a JioSaavn search query.
@@ -237,5 +231,6 @@ class JioSaavnPlugin(BeetsPlugin):
             response = requests.get(url)
             Image.open(BytesIO(response.content))
             return True
-        except:
+        except Exception as e:
+            self._log.debug('Invalid Image URL: {}'.format(e))
             return False
