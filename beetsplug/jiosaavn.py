@@ -67,13 +67,13 @@ class JioSaavnPlugin(MetadataSourcePlugin):
         self._log.debug('Searching JioSaavn for: {}', query)
         try:
             data = self.jiosaavn.search_album(query)
+            for album in data["results"]:
+                id = self.jiosaavn.create_identifier(album["perma_url"], 'album')
+                album_details = self.jiosaavn.get_album_details(id)
+                album_info = self.get_album_info(album_details, album["type"])
+                albums.append(album_info)
         except Exception as e:
             self._log.debug('Invalid Search Error: {}'.format(e))
-        for album in data["results"]:
-            id = self.jiosaavn.create_identifier(album["perma_url"], 'album')
-            album_details = self.jiosaavn.get_album_details(id)
-            album_info = self.get_album_info(album_details, album["type"])
-            albums.append(album_info)
         return albums
 
     def get_tracks(self, query):
@@ -91,13 +91,14 @@ class JioSaavnPlugin(MetadataSourcePlugin):
         self._log.debug('Searching JioSaavn for: {}', query)
         try:
             data = self.jiosaavn.search_song(query)
+            for track in data["results"]:
+                id = self.jiosaavn.create_identifier(track["perma_url"], 'song')
+                song_details = self.jiosaavn.get_song_details(id)
+                song_data = song_details.get("songs", [song_details])[0]
+                song_info = self._get_track(song_data)
+                tracks.append(song_info)
         except Exception as e:
             self._log.debug('Invalid Search Error: {}'.format(e))
-        for track in data["results"]:
-            id = self.jiosaavn.create_identifier(track["perma_url"], 'song')
-            song_details = self.jiosaavn.get_song_details(id)
-            song_info = self._get_track(song_details["songs"][0])
-            tracks.append(song_info)
         return tracks
 
     def candidates(self, items, artist, release, va_likely, extra_tags=None):
@@ -133,12 +134,16 @@ class JioSaavnPlugin(MetadataSourcePlugin):
         perma_url = item["perma_url"]
         artist_id = item["primary_artists_id"]
         year = item["year"]
+        month = None
+        day = None
+        cover_art_url = None
+        label = None
         url = item["image"].replace("150x150", "500x500")
         if self.is_valid_image_url(url):
             cover_art_url = url
         if item["songs"][0]["label"] is not None:
             label = item["songs"][0]["label"]
-        if item["release_date"] is not None:
+        if item["release_date"]:
             releasedate = item["release_date"].split("-")
             year = int(releasedate[0])
             month = int(releasedate[1])
@@ -148,6 +153,12 @@ class JioSaavnPlugin(MetadataSourcePlugin):
         tracks = []
         medium_totals = collections.defaultdict(int)
         for i, song in enumerate(songs, start=1):
+            if not isinstance(song, dict):
+                self._log.debug(
+                    'Skipping unexpected song entry from JioSaavn API '
+                    '(expected dict, got {}): {}', type(song).__name__, song
+                )
+                continue
             track = self._get_track(song)
             track.index = i
             medium_totals[track.medium] += 1
@@ -176,12 +187,8 @@ class JioSaavnPlugin(MetadataSourcePlugin):
     def _get_track(self, track_data):
         """Convert a JioSaavn song object to a TrackInfo object.
         """
-        if track_data['duration']:
-            length = int(track_data['duration'].strip())
-        elif track_data['more_info']['duration']:
-            length = int(track_data['more_info']['duration'].strip())
-        else:
-            length = None
+        duration = track_data.get('duration') or track_data.get('more_info', {}).get('duration')
+        length = int(duration.strip()) if duration and duration.strip() else None
         if track_data['singers'] == "":
             artist = track_data['music']
         else:
