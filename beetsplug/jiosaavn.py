@@ -138,18 +138,18 @@ class JioSaavnPlugin(MetadataSourcePlugin):
         day = None
         cover_art_url = None
         label = None
+        songs = item.get("songs") or []
         url = item["image"].replace("150x150", "500x500")
         if self.is_valid_image_url(url):
             cover_art_url = url
-        if item["songs"][0]["label"] is not None:
-            label = item["songs"][0]["label"]
+        if songs and isinstance(songs[0], dict):
+            label = songs[0].get("label")
         if item["release_date"]:
             releasedate = item["release_date"].split("-")
             year = int(releasedate[0])
             month = int(releasedate[1])
             day = int(releasedate[2])
         artists = item["primary_artists"]
-        songs = item["songs"]
         tracks = []
         medium_totals = collections.defaultdict(int)
         for i, song in enumerate(songs, start=1):
@@ -176,7 +176,7 @@ class JioSaavnPlugin(MetadataSourcePlugin):
                          year=year,
                          month=month,
                          day=day,
-                         mediums=max(medium_totals.keys()),
+                         mediums=max(medium_totals, default=None),
                          data_source=self.data_source,
                          jiosaavn_perma_url=perma_url,
                          data_url=perma_url,
@@ -226,12 +226,13 @@ class JioSaavnPlugin(MetadataSourcePlugin):
     def track_for_id(self, track_id=None):
         """Fetches a track by its JioSaavn ID and returns a TrackInfo object
         """
-        if 'jiosaavn.com/song/' not in track_id:
+        if not track_id or 'jiosaavn.com/song/' not in track_id:
             return None
         self._log.debug('Searching for track {0}', track_id)
         id = self.jiosaavn.create_identifier(track_id, 'song')
         song_details = self.jiosaavn.get_song_details(id)
-        return self._get_track(song_details["songs"][0])
+        song_data = song_details.get("songs", [song_details])[0]
+        return self._get_track(song_data)
 
     def is_valid_image_url(self, url):
         try:
