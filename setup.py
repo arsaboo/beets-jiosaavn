@@ -12,7 +12,7 @@ setup(
     platforms='ALL',
     packages=['beetsplug'],
     install_requires=[
-        'beets>=2.4.0',
+        'beets>=2.10.0',
         'MusicAPy @ git+https://github.com/dmdhrumilmistry/MusicAPy',
         'requests',
         'pillow',
