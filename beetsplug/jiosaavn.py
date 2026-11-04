@@ -8,16 +8,30 @@ import time
 from io import BytesIO
 
 import requests
-from beets.autotag.distance import Distance
 from beets.autotag.hooks import AlbumInfo, TrackInfo
 from beets.dbcore import types
 from beets.library import DateType
-from beets.plugins import BeetsPlugin
+from beets.metadata_plugins import MetadataSourcePlugin
 from musicapy.saavn_api.api import SaavnAPI
 from PIL import Image
 
+try:
+    from beets.importer.tasks import REIMPORT_FRESH_FIELDS_ITEM
+except ImportError:
+    REIMPORT_FRESH_FIELDS_ITEM = None
 
-class JioSaavnPlugin(BeetsPlugin):
+
+def extend_reimport_fresh_fields_item():
+    """Extend the REIMPORT_FRESH_FIELDS_ITEM list so that these fields
+    are updated during reimport."""
+
+    if REIMPORT_FRESH_FIELDS_ITEM is not None:
+        REIMPORT_FRESH_FIELDS_ITEM.extend([
+            'jiosaavn_album_id', 'jiosaavn_track_id', 'jiosaavn_artist_id',
+            'jiosaavn_starring', 'jiosaavn_perma_url', 'jiosaavn_updated'])
+
+
+class JioSaavnPlugin(MetadataSourcePlugin):
     data_source = 'JioSaavn'
 
     item_types = {
@@ -33,30 +47,10 @@ class JioSaavnPlugin(BeetsPlugin):
     def __init__(self):
         super().__init__()
         self.config.add({
-            'source_weight': 0.5,
+            'data_source_mismatch_penalty': 0.5,
         })
+        extend_reimport_fresh_fields_item()
         self.jiosaavn = SaavnAPI()
-
-    def album_distance(self, items, album_info, mapping):
-
-        """Returns the album distance.
-        """
-        dist = Distance()
-        if album_info.data_source == 'JioSaavn':
-            dist.add('source', self.config['source_weight'].as_number())
-        return dist
-
-    def track_distance(self, item, track_info):
-
-        """Returns the JioSaavn source weight and the maximum source weight
-        for individual tracks.
-        """
-        dist = Distance()
-        if track_info.data_source == 'JioSaavn':
-            dist.add('source', self.config['source_weight'].as_number())
-        return dist
-
-    # jiosaavn = SaavnAPI()
 
     def get_albums(self, query):
         """Returns a list of AlbumInfo objects for a JioSaavn search query.
@@ -144,18 +138,18 @@ class JioSaavnPlugin(BeetsPlugin):
         day = None
         cover_art_url = None
         label = None
+        songs = item.get("songs") or []
         url = item["image"].replace("150x150", "500x500")
         if self.is_valid_image_url(url):
             cover_art_url = url
-        if item["songs"][0]["label"] is not None:
-            label = item["songs"][0]["label"]
+        if songs and isinstance(songs[0], dict):
+            label = songs[0].get("label")
         if item["release_date"]:
             releasedate = item["release_date"].split("-")
             year = int(releasedate[0])
             month = int(releasedate[1])
             day = int(releasedate[2])
         artists = item["primary_artists"]
-        songs = item["songs"]
         tracks = []
         medium_totals = collections.defaultdict(int)
         for i, song in enumerate(songs, start=1):
@@ -182,7 +176,7 @@ class JioSaavnPlugin(BeetsPlugin):
                          year=year,
                          month=month,
                          day=day,
-                         mediums=max(medium_totals.keys()),
+                         mediums=max(medium_totals, default=None),
                          data_source=self.data_source,
                          jiosaavn_perma_url=perma_url,
                          data_url=perma_url,
@@ -232,17 +226,19 @@ class JioSaavnPlugin(BeetsPlugin):
     def track_for_id(self, track_id=None):
         """Fetches a track by its JioSaavn ID and returns a TrackInfo object
         """
-        if 'jiosaavn.com/song/' not in track_id:
+        if not track_id or 'jiosaavn.com/song/' not in track_id:
             return None
         self._log.debug('Searching for track {0}', track_id)
         id = self.jiosaavn.create_identifier(track_id, 'song')
         song_details = self.jiosaavn.get_song_details(id)
-        return self._get_track(song_details["songs"][0])
+        song_data = song_details.get("songs", [song_details])[0]
+        return self._get_track(song_data)
 
     def is_valid_image_url(self, url):
         try:
             response = requests.get(url)
             Image.open(BytesIO(response.content))
             return True
-        except:
+        except Exception as e:
+            self._log.debug('Invalid Image URL: {}'.format(e))
             return False
